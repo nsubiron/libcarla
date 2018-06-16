@@ -1,0 +1,22 @@
+language: cpp
+
+os: linux
+dist: trusty
+sudo: false
+
+compiler: clang
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-trusty-5.0
+    packages:
+      - clang-5.0
+      - ninja-build
+
+script:
+  - make
+  - make check_debug
+  - make check_release
+
+notifications:
+  email: false
