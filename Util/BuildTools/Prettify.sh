@@ -1,24 +1,17 @@
 #! /bin/bash
 
-set -e
-
 # ==============================================================================
 # -- Set up environment --------------------------------------------------------
 # ==============================================================================
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-pushd "$SCRIPT_DIR" >/dev/null
-
-function log {
-  echo "`basename "$0"`: $1"
-}
+source $(dirname "$0")/Environment.sh
 
 # ==============================================================================
 # -- Get latest version of uncrustify ------------------------------------------
 # ==============================================================================
 
-mkdir -p build
-pushd build >/dev/null
+mkdir -p ${CARLA_BUILD_FOLDER}
+pushd ${CARLA_BUILD_FOLDER} >/dev/null
 
 UNCRUSTIFY_BASENAME=uncrustify-0.67
 
@@ -54,7 +47,9 @@ else
 
 fi
 
-log "Using `${UNCRUSTIFY} --version`"
+command -v ${UNCRUSTIFY} >/dev/null 2>&1 || {
+  fatal_error "Failed to install Uncrustify!";
+}
 
 popd >/dev/null
 
@@ -62,15 +57,15 @@ popd >/dev/null
 # -- Run uncrustify on each source file ----------------------------------------
 # ==============================================================================
 
-UNCRUSTIFY_COMMAND="${UNCRUSTIFY} -c uncrustify.cfg --no-backup --replace"
+UNCRUSTIFY_CONFIG=${CARLA_BUILD_TOOLS_FOLDER}/uncrustify.cfg
+UNCRUSTIFY_COMMAND="${UNCRUSTIFY} -c ${UNCRUSTIFY_CONFIG} --no-backup --replace"
 
+pushd ${CARLALIB_ROOT_FOLDER} >/dev/null
 find source -iregex '.*\.\(h\|cpp\)$' -exec ${UNCRUSTIFY_COMMAND} {} \;
+popd >/dev/null
 
 # ==============================================================================
 # -- ...and we are done --------------------------------------------------------
 # ==============================================================================
 
-popd >/dev/null
-
-set +x
 log "Success!"
