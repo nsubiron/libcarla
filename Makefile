@@ -31,5 +31,8 @@ docs:
 	@doxygen
 	@echo "Documentation index at ./doxygen/html/index.html"
 
+pretty:
+	@./Prettify.sh
+
 clean:
 	@rm -Rf $(BUILD_FOLDER)
