@@ -9,4 +9,11 @@ include_directories(${carlalib_source_path})
 
 configure_file(${carlalib_source_path}/carla/Version.h.in ${carlalib_source_path}/carla/Version.h)
 
-add_subdirectory("cmake/tests")
+if (CMAKE_BUILD_TYPE STREQUAL "Client")
+  add_subdirectory("cmake/client")
+elseif (CMAKE_BUILD_TYPE STREQUAL "Server")
+  add_subdirectory("cmake/server")
+  add_subdirectory("cmake/test")
+else ()
+  message(FATAL_ERROR "Unknown build type '${CMAKE_BUILD_TYPE}'")
+endif ()
