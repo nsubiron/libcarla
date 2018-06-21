@@ -21,13 +21,14 @@ addons:
       - libboost-python-dev
 
 before_install:
-  - pip2 install setuptools
-  - pip3 install setuptools
+  - pip2 install --user setuptools nose2
+  - pip3 install --user setuptools nose2
 
 script:
   - make
   - make dist
   - make check
+  - (cd PythonAPI/test && python2 -m nose2 && python3 -m nose2)
 
 notifications:
   email: false
