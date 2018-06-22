@@ -1,11 +1,12 @@
 from setuptools import setup, Extension
 
+import glob
 import os
 import platform
 import sys
 
 
-def get_libcarla_extension():
+def get_libcarla_extensions():
     libraries = ['carla_client', 'rpc']
 
     if os.name == "posix":
@@ -17,19 +18,22 @@ def get_libcarla_extension():
     else:
         raise NotImplementedError
 
-    return Extension(
-        'carla.libcarla',
-        sources=['source/libcarla/Client.cpp'],
-        include_dirs=[
-            '/usr/local/include',
-            'dependencies/include'],
-        library_dirs=[
-            '/usr/local/lib/boost',
-            'dependencies/lib'],
-        runtime_library_dirs=['/usr/local/lib/boost'],
-        libraries=libraries,
-        extra_compile_args=['-fPIC', '-std=c++17'],
-        language='c++17')
+    def make_extension(name, sources):
+        return Extension(
+            name,
+            sources=sources,
+            include_dirs=[
+                '/usr/local/include',
+                'dependencies/include'],
+            library_dirs=[
+                '/usr/local/lib/boost',
+                'dependencies/lib'],
+            runtime_library_dirs=['/usr/local/lib/boost'],
+            libraries=libraries,
+            extra_compile_args=['-fPIC', '-std=c++17'],
+            language='c++17')
+
+    return [make_extension('carla.libcarla', glob.glob('source/libcarla/*.cpp'))]
 
 
 setup(
@@ -37,7 +41,7 @@ setup(
     version='0.9.0',
     package_dir={'': 'source'},
     packages=['carla'],
-    ext_modules=[get_libcarla_extension()],
+    ext_modules=get_libcarla_extensions(),
     license='MIT License',
     description='Python API for communicating with the CARLA server.',
     url='https://github.com/carla-simulator/carla',
