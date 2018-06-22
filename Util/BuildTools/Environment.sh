@@ -20,3 +20,8 @@ function fatal_error {
 function get_carla_version {
   git describe --tags --dirty --always
 }
+
+function copy_if_changed {
+  mkdir -p $(dirname $2)
+  rsync -cI --out-format="%n" $1 $2
+}

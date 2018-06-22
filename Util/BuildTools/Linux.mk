@@ -9,6 +9,9 @@ launch: CarlaLib
 launch-only:
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --launch
 
+package: CarlaUE4Editor PythonAPI
+	@${CARLA_BUILD_TOOLS_FOLDER}/Package.sh
+
 docs:
 	@doxygen
 	@echo "Documentation index at ./doxygen/html/index.html"

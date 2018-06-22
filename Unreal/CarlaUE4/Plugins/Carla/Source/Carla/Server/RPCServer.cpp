@@ -50,13 +50,13 @@ void FRPCServer::Initialize(AServer &Server, uint16_t Port)
 {
   UE_LOG(LogTemp, Error, TEXT("Initializing rpc-server at port %d"), Port);
 
-  try {
+  // try {
     _Pimpl = std::make_unique<Pimpl>(Port);
-  } catch (const std::exception &e) {
-    UE_LOG(LogTemp, Error, TEXT("Exception thrown"));
-    UE_LOG(LogTemp, Error, TEXT("%s"), e.what());
-    return;
-  }
+  // } catch (const std::exception &e) {
+  //   UE_LOG(LogTemp, Error, TEXT("Exception thrown"));
+  //   UE_LOG(LogTemp, Error, TEXT("%s"), e.what());
+  //   return;
+  // }
 
   namespace cn = carla::networking;
 

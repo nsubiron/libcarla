@@ -18,6 +18,10 @@ Use the following commands:
         Launch CarlaUE4 project in Unreal Engine's Editor, but skip building
         step (assume the project is already built).
 
+    package:
+
+        Makes a packaged version of CARLA ready for distribution.
+
     docs:
 
         Build CARLA Doxygen's documentation.
