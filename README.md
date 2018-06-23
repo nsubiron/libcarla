@@ -38,6 +38,13 @@ process.
 
 ## Compilation
 
+Required installed dependencies,
+
+    $ sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+    $ sudo apt-get install clang-5.0 lld-5.0 g++-7 ninja-build python python-pip python3 python3-pip libboost-python-dev
+    $ pip2 install --user setuptools nose2
+    $ pip3 install --user setuptools nose2
+
 Required compiler
 
   * clang++-5.0
@@ -49,7 +56,32 @@ Best if it is set up as default version of clang
 
 Everything is compiled with `-std=c++17`.
 
-#### Dependencies
+Required CMake 3.9 or higher.
+
+Required Unreal Engine 4.19, install with the usual
+
+    $ git clone --depth=1 -b 4.19 https://github.com/EpicGames/UnrealEngine.git ~/UnrealEngine_4.19
+    $ cd ~/UnrealEngine_4.19
+    $ ./Setup.sh && ./GenerateProjectFiles.sh && make
+
+and set your `UE4_ROOT` environment variable
+
+    $ export UE4_ROOT=~/UnrealEngine_4.19
+
+Once everything is installed, run one of the following commands
+
+```sh
+$ make launch   # Compiles CARLA and launches Unreal Engine's Editor.
+$ make package  # Compiles CARLA and creates a packaged version for distribution.
+$ make help     # Print all available commands.
+```
+
+## Compilation details
+
+Here a detailed description of the different modules that need to be compiled.
+The Makefile compiles these modules incrementally as needed.
+
+#### Setup
 
 Command
 
@@ -68,7 +100,7 @@ Compiled with CMake (min. version required CMake 3.9).
 
 Command
 
-    $ make build
+    $ make CarlaLib
 
 Two configurations:
 
@@ -82,22 +114,16 @@ Two configurations:
 
 #### CarlaUE4 and Carla plugin
 
-Both compiled at the same step with Unreal Engine 4.19 build tool. First of all,
-it requires to install Unreal Engine with the usual
+Both compiled at the same step with Unreal Engine 4.19 build tool. They require
+the `UE4_ROOT` environment variable set.
 
-    $ git clone --depth=1 -b 4.19 https://github.com/EpicGames/UnrealEngine.git ~/UnrealEngine_4.19
-    $ cd ~/UnrealEngine_4.19
-    $ ./Setup.sh && ./GenerateProjectFiles.sh && make
+Command
 
-Don't forget to set your `UE4_ROOT` environment variable
+    $ make CarlaUE4Editor
 
-    $ export UE4_ROOT=~/UnrealEngine_4.19
+To launch Unreal Engine's Editor run
 
-Then build and launch CarlaUE4 project with
-
-    $ make CarlaUE4Editor launch
-
-UE4Editor should open after compilation.
+    $ make launch
 
 #### PythonAPI
 
@@ -107,12 +133,12 @@ libboost-python-dev; both for Python 2.7 and 3.5.
 
 Command
 
-    $ make dist
+    $ make PythonAPI
 
 It creates two "egg" packages
 
-  * PythonAPI/dist/carla-0.9.0-py2.7-linux-x86_64.egg
-  * PythonAPI/dist/carla-0.9.0-py3.5-linux-x86_64.egg
+  * `PythonAPI/dist/carla-0.9.0-py2.7-linux-x86_64.egg`
+  * `PythonAPI/dist/carla-0.9.0-py3.5-linux-x86_64.egg`
 
 This package can be directly imported into a Python script by adding it to the
 system path
