@@ -1,5 +1,6 @@
 from setuptools import setup, Extension
 
+import fnmatch
 import glob
 import os
 import platform
@@ -18,6 +19,13 @@ def get_libcarla_extensions():
     else:
         raise NotImplementedError
 
+    def walk(folder, file_filter='*'):
+        for root, _, filenames in os.walk(folder):
+            for filename in fnmatch.filter(filenames, file_filter):
+                yield os.path.join(root, filename)
+
+    depends = [x for x in walk('dependencies')]
+
     def make_extension(name, sources):
         return Extension(
             name,
@@ -31,7 +39,8 @@ def get_libcarla_extensions():
             runtime_library_dirs=['/usr/local/lib/boost'],
             libraries=libraries,
             extra_compile_args=['-fPIC', '-std=c++17'],
-            language='c++17')
+            language='c++17',
+            depends=depends)
 
     return [make_extension('carla.libcarla', glob.glob('source/libcarla/*.cpp'))]
 

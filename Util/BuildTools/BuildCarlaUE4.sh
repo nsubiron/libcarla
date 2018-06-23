@@ -106,11 +106,11 @@ if ${BUILD_CARLAUE4} ; then
 
   # This command fails sometimes but normally we can continue anyway.
   set +e
-  log "Generate Unreal project files..."
+  log "Generate Unreal project files."
   ${UE4_ROOT}/GenerateProjectFiles.sh -project="${PWD}/CarlaUE4.uproject" -game -engine -makefiles
   set -e
 
-  log "Build CarlaUE4 project..."
+  log "Build CarlaUE4 project."
   make CarlaUE4Editor
 
 fi

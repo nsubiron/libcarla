@@ -9,7 +9,7 @@ source $(dirname "$0")/Vars.mk
 unset CURDIR
 
 function log {
-  echo -e "\033[1;94m`basename "$0"`: $1\033[0m"
+  echo -e "\033[1;35m`basename "$0"`: $1\033[0m"
 }
 
 function fatal_error {
@@ -24,4 +24,9 @@ function get_carla_version {
 function copy_if_changed {
   mkdir -p $(dirname $2)
   rsync -cI --out-format="%n" $1 $2
+}
+
+function move_if_changed {
+  copy_if_changed $1 $2
+  rm -f $1
 }

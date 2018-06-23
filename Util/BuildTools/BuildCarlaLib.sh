@@ -87,7 +87,7 @@ if ${BUILD_SERVER} ; then
 
   ninja
 
-  ninja install
+  ninja install | grep -v "Up-to-date:"
 
   popd >/dev/null
 
@@ -117,7 +117,7 @@ if ${BUILD_CLIENT} ; then
 
   ninja
 
-  ninja install
+  ninja install | grep -v "Up-to-date:"
 
   popd >/dev/null
 

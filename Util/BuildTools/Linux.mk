@@ -38,7 +38,7 @@ CarlaUE4Editor: CarlaLib
 
 .PHONY: PythonAPI
 PythonAPI: CarlaLib
-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rebuild
+	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --py2 --py3
 
 .PHONY: CarlaLib
 CarlaLib: setup

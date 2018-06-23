@@ -56,7 +56,7 @@ if $DO_PACKAGE ; then
 
   pushd "${CARLAUE4_ROOT_FOLDER}" >/dev/null
 
-  log "Packaging the project..."
+  log "Packaging the project."
 
   if [ ! -d "${UE4_ROOT}" ]; then
     fatal_error "UE4_ROOT is not defined, or points to a non-existant directory, please set this environment variable."
@@ -89,7 +89,7 @@ if $DO_COPY_FILES ; then
 
   DESTINATION=${BUILD_FOLDER}/LinuxNoEditor
 
-  log "Adding extra files to package..."
+  log "Adding extra files to package."
 
   pushd ${CARLA_ROOT_FOLDER} >/dev/null
 
@@ -115,7 +115,7 @@ if $DO_TARBALL ; then
 
   pushd "${SOURCE}" >/dev/null
 
-  log "Packaging build..."
+  log "Packaging build."
 
   rm -f ./Manifest_NonUFSFiles_Linux.txt
   rm -Rf ./CarlaUE4/Saved
@@ -133,7 +133,7 @@ fi
 
 if $DO_CLEAN_INTERMEDIATE ; then
 
-  log "Removing intermediate build..."
+  log "Removing intermediate build."
 
   rm -Rf ${BUILD_FOLDER}
 

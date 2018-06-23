@@ -22,11 +22,11 @@ if [[ -d "${UNCRUSTIFY_BASENAME}-install" ]] ; then
 else
   rm -Rf ${UNCRUSTIFY_BASENAME}-source ${UNCRUSTIFY_BASENAME}-build
 
-  log "Retrieving Uncrustify..."
+  log "Retrieving Uncrustify."
 
   git clone --depth=1 -b uncrustify-0.67 https://github.com/uncrustify/uncrustify.git ${UNCRUSTIFY_BASENAME}-source
 
-  log "Building Uncrustify..."
+  log "Building Uncrustify."
 
   mkdir -p ${UNCRUSTIFY_BASENAME}-build
 
