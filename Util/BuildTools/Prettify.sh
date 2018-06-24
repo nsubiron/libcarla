@@ -7,6 +7,52 @@
 source $(dirname "$0")/Environment.sh
 
 # ==============================================================================
+# -- Parse arguments -----------------------------------------------------------
+# ==============================================================================
+
+DOC_STRING="Prettify code files."
+
+USAGE_STRING="Usage: $0 [-h|--help] [--all] [-f path|--file=path]"
+
+PRETTIFY_ALL=false
+PRETTIFY_FILE=false
+
+OPTS=`getopt -o hf: --long help,all,file: -n 'parse-options' -- "$@"`
+
+if [ $? != 0 ] ; then echo "$USAGE_STRING" ; exit 2 ; fi
+
+eval set -- "$OPTS"
+
+while true; do
+  case "$1" in
+    --all )
+      PRETTIFY_ALL=true;
+      shift ;;
+    -f | --file )
+      PRETTIFY_FILE="$2";
+      shift ;;
+    -h | --help )
+      echo "$DOC_STRING"
+      echo "$USAGE_STRING"
+      exit 1
+      ;;
+    * )
+      break ;;
+  esac
+done
+
+if ! { ${PRETTIFY_ALL} || [ -n "${PRETTIFY_FILE}" ]; } ; then
+  fatal_error "Nothing selected to be done."
+fi
+
+if ${PRETTIFY_ALL} ; then
+  PRETTIFY_FILE=false
+elif [[ ! -f ${PRETTIFY_FILE} ]] ; then
+  pwd
+  fatal_error "\"${PRETTIFY_FILE}\" no such file."
+fi
+
+# ==============================================================================
 # -- Get latest version of uncrustify ------------------------------------------
 # ==============================================================================
 
@@ -53,16 +99,36 @@ command -v ${UNCRUSTIFY} >/dev/null 2>&1 || {
 
 popd >/dev/null
 
+command -v autopep8 >/dev/null 2>&1 || {
+  log "Installing autopep8 for this user."
+  pip3 install --user autopep8
+}
+
 # ==============================================================================
-# -- Run uncrustify on each source file ----------------------------------------
+# -- Run uncrustify and/or autopep8 --------------------------------------------
 # ==============================================================================
 
 UNCRUSTIFY_CONFIG=${CARLA_BUILD_TOOLS_FOLDER}/uncrustify.cfg
 UNCRUSTIFY_COMMAND="${UNCRUSTIFY} -c ${UNCRUSTIFY_CONFIG} --no-backup --replace"
 
-pushd ${CARLALIB_ROOT_FOLDER} >/dev/null
-find source -iregex '.*\.\(h\|cpp\)$' -exec ${UNCRUSTIFY_COMMAND} {} \;
-popd >/dev/null
+AUTOPEP8_COMMAND="autopep8 --jobs 0 --in-place -a"
+
+if ${PRETTIFY_ALL} ; then
+
+  find ${CARLA_ROOT_FOLDER} -iregex '.*\.\(py\)$' -exec ${AUTOPEP8_COMMAND} {} +
+  # find ${CARLALIB_ROOT_FOLDER} -iregex '.*\.\(h\|cpp\)$' -exec ${UNCRUSTIFY_COMMAND} {} \;
+
+elif [[ -f ${PRETTIFY_FILE} ]] ; then
+
+  if [[ ${PRETTIFY_FILE} == *.py ]] ; then
+    log "autopep8 ${PRETTIFY_FILE}"
+    ${AUTOPEP8_COMMAND} ${PRETTIFY_FILE}
+  else
+    log "uncrustify ${PRETTIFY_FILE}"
+    ${UNCRUSTIFY_COMMAND} ${PRETTIFY_FILE}
+  fi
+
+fi
 
 # ==============================================================================
 # -- ...and we are done --------------------------------------------------------

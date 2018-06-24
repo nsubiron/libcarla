@@ -50,4 +50,4 @@ setup:
 	@${CARLA_BUILD_TOOLS_FOLDER}/Setup.sh
 
 pretty:
-	@${CARLA_BUILD_TOOLS_FOLDER}/Prettify.sh
+	@${CARLA_BUILD_TOOLS_FOLDER}/Prettify.sh $(ARGS)
