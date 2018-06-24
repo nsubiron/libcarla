@@ -1,26 +1,26 @@
 #include "test.h"
 
 #include <carla/ThreadGroup.h>
-#include <carla/streaming/tcp/Client.h>
-#include <carla/streaming/tcp/Server.h>
+#include <carla/streaming/low_level/tcp/Client.h>
+#include <carla/streaming/low_level/tcp/Server.h>
 
 #include <atomic>
 
-using namespace std::chrono_literals;
-
-TEST(streaming_tcp, small_message) {
-  using namespace carla::streaming;
+TEST(streaming_low_level_tcp, small_message) {
+  using namespace util::message;
+  using namespace carla::streaming::low_level;
   using shared_session = std::shared_ptr<tcp::ServerSession>;
 
   boost::asio::io_service io_service;
   tcp::Server::endpoint ep(boost::asio::ip::tcp::v4(), TESTING_PORT);
 
   tcp::Server srv(io_service, ep);
+  srv.set_timeout(1s);
   std::atomic_bool done{false};
   std::atomic_size_t message_count{0u};
 
-  srv.Listen(boost::posix_time::seconds(1), [&](std::shared_ptr<tcp::ServerSession> session) {
-    ASSERT_EQ(session->GetToken(), 42u);
+  srv.Listen([&](std::shared_ptr<tcp::ServerSession> session) {
+    ASSERT_EQ(session->get_stream_id(), 42u);
     const std::string msg = "Hola!";
     auto message = std::make_shared<Message>(boost::asio::buffer(msg));
     while (!done) {
@@ -36,7 +36,7 @@ TEST(streaming_tcp, small_message) {
     ++message_count;
     ASSERT_NE(message, nullptr);
     ASSERT_EQ(message->size(), 5u);
-    const std::string msg = message->reinterpret_as_string();
+    const std::string msg = as_string(*message);
     ASSERT_EQ(msg, std::string("Hola!"));
   });
 

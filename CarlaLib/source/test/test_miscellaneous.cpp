@@ -2,6 +2,6 @@
 
 #include <carla/Version.h>
 
-TEST(misc, version) {
+TEST(miscellaneous, version) {
   std::cout << "CarlaLib " << carla::version() << std::endl;
 }

@@ -232,6 +232,7 @@ cat >${CMAKE_CONFIG_FILE}.gen <<EOL
 
 set(CARLA_VERSION $(get_carla_version))
 
+add_definitions(-DBOOST_COROUTINES_NO_DEPRECATION_WARNING)
 add_definitions(-DBOOST_ERROR_CODE_HEADER_ONLY)
 
 set(BOOST_INCLUDE_PATH "${BOOST_INCLUDE}")

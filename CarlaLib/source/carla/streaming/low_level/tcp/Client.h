@@ -3,7 +3,7 @@
 #include "carla/Debug.h"
 #include "carla/Logging.h"
 #include "carla/streaming/Message.h"
-#include "carla/streaming/tcp/Encoding.h"
+#include "carla/streaming/low_level/Types.h"
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -15,9 +15,10 @@
 
 namespace carla {
 namespace streaming {
+namespace low_level {
 namespace tcp {
 
-  class Client {
+  class Client : private boost::noncopyable {
   public:
 
     using endpoint = boost::asio::ip::tcp::endpoint;
@@ -28,7 +29,7 @@ namespace tcp {
         _strand(io_service) {}
 
     template <typename Functor>
-    void Subscribe(token_type token, Functor callback) {
+    void Subscribe(stream_id_type token, Functor callback) {
       log_debug("streaming client: subscribing to stream", token, "at", _endpoint);
       _strand.post([=]() { Connect(token, callback); });
     }
@@ -36,10 +37,10 @@ namespace tcp {
   private:
 
     template <typename Functor>
-    void Connect(token_type token, Functor callback);
+    void Connect(stream_id_type token, Functor callback);
 
     template <typename Functor>
-    void ReadData(token_type token, Functor callback);
+    void ReadData(stream_id_type token, Functor callback);
 
     endpoint _endpoint;
 
@@ -49,7 +50,7 @@ namespace tcp {
   };
 
   template <typename Functor>
-  void Client::Connect(token_type token, Functor callback) {
+  void Client::Connect(stream_id_type token, Functor callback) {
     using boost::system::error_code;
 
     if (_socket.is_open()) {
@@ -64,7 +65,7 @@ namespace tcp {
             boost::asio::buffer(&token, sizeof(token)),
             _strand.wrap([=](error_code ec, size_t DEBUG_ONLY(bytes)) {
           if (!ec) {
-            DEBUG_ASSERT(bytes == sizeof(token));
+            DEBUG_ASSERT_EQ(bytes, sizeof(token));
             // If succeeded start reading data.
             ReadData(token, callback);
           } else {
@@ -84,16 +85,15 @@ namespace tcp {
   }
 
   template <typename Functor>
-  void Client::ReadData(token_type token, Functor callback) {
+  void Client::ReadData(stream_id_type token, Functor callback) {
     using boost::system::error_code;
 
     auto message = std::make_shared<Message>();
 
     auto handle_read_data = [=](error_code ec, size_t DEBUG_ONLY(bytes)) {
       if (!ec) {
-        DEBUG_ASSERT(bytes == message->size());
-        // Move the buffer to the callback function and start reading the
-        // next
+        DEBUG_ASSERT_EQ(bytes, message->size());
+        // Move the buffer to the callback function and start reading the next
         // piece of data.
         callback(std::move(message));
         ReadData(token, callback);
@@ -106,7 +106,7 @@ namespace tcp {
 
     auto handle_read_header = [=](error_code ec, size_t DEBUG_ONLY(bytes)) {
       if (!ec) {
-        DEBUG_ASSERT(bytes == sizeof(message_size_type));
+        DEBUG_ASSERT_EQ(bytes, sizeof(message_size_type));
         // Now that we know the size of the coming buffer, we can allocate
         // our buffer and start putting data into it.
         (*message) = Message(message->size());
@@ -126,5 +126,6 @@ namespace tcp {
   }
 
 } // namespace tcp
+} // namespace low_level
 } // namespace streaming
 } // namespace carla

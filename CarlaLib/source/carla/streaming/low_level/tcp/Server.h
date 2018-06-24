@@ -1,31 +1,40 @@
 #pragma once
 
-#include "carla/streaming/tcp/ServerSession.h"
+#include "carla/streaming/low_level/tcp/ServerSession.h"
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/spawn.hpp>
 
+#include <atomic>
 #include <memory>
 #include <string>
 
 namespace carla {
 namespace streaming {
+namespace low_level {
 namespace tcp {
 
-  class Server {
+  class Server : private boost::noncopyable {
   public:
 
     using endpoint = boost::asio::ip::tcp::endpoint;
+    using protocol_type = endpoint::protocol_type;
     using duration_type = ServerSession::duration_type;
 
     explicit Server(boost::asio::io_service &io_service, endpoint ep)
-      : _acceptor(io_service, std::move(ep)) {}
+      : _acceptor(io_service, std::move(ep)),
+        _timeout(duration_type::seconds(10u)) {}
+
+    /// Set session time-out. Applies only to newly created sessions.
+    void set_timeout(duration_type timeout) {
+      _timeout = timeout;
+    }
 
     template <typename Functor>
-    void Listen(duration_type timeout, Functor callback) {
+    void Listen(Functor callback) {
       log_info("starting streaming server at port", _acceptor.local_endpoint().port());
-      _acceptor.get_io_service().post([=]() { OpenSession(timeout, callback); });
+      _acceptor.get_io_service().post([=]() { OpenSession(_timeout, callback); });
     }
 
   private:
@@ -52,8 +61,11 @@ namespace tcp {
     }
 
     boost::asio::ip::tcp::acceptor _acceptor;
+
+    std::atomic<timeout_type> _timeout;
   };
 
 } // namespace tcp
+} // namespace low_level
 } // namespace streaming
 } // namespace carla

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.9.0)
 project(libcarla-unit-tests)
 
 file(GLOB_RECURSE carlalib_test_sources
+    "${carlalib_source_path}/carla/profiler/*.h"
+    "${carlalib_source_path}/carla/profiler/*.cpp"
     "${carlalib_source_path}/test/*.h"
     "${carlalib_source_path}/test/*.cpp")
 
@@ -12,6 +14,10 @@ link_directories(
 # Create targets for debug and release in the same build type.
 foreach(target carlalib_test_debug carlalib_test_release)
   add_executable(${target} ${carlalib_test_sources})
+
+  target_compile_definitions(carlalib_test_debug PUBLIC
+      -DCARLALIB_ENABLE_PROFILER
+      -DCARLALIB_WITH_GTEST)
 
   target_include_directories(${target} PRIVATE
       "${BOOST_INCLUDE_PATH}"

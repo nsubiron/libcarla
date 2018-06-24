@@ -3,7 +3,8 @@
 #include "carla/Debug.h"
 #include "carla/Logging.h"
 #include "carla/streaming/Message.h"
-#include "carla/streaming/tcp/Encoding.h"
+#include "carla/streaming/low_level/Types.h"
+#include "carla/streaming/low_level/tcp/Timeout.h"
 
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/asio/io_service.hpp>
@@ -15,16 +16,19 @@
 
 namespace carla {
 namespace streaming {
+namespace low_level {
 namespace tcp {
 
   /// A TCP server session. When a session opens, it reads from the socket a
-  /// token object and passes itself to the callback functor. The session
+  /// stream id object and passes itself to the callback functor. The session
   /// closes itself after @a timeout of inactivity is met.
-  class ServerSession : public std::enable_shared_from_this<ServerSession> {
+  class ServerSession
+    : public std::enable_shared_from_this<ServerSession>,
+      private boost::noncopyable {
   public:
 
     using socket_type = boost::asio::ip::tcp::socket;
-    using duration_type = boost::asio::deadline_timer::duration_type;
+    using duration_type = timeout_type;
 
     explicit ServerSession(boost::asio::io_service &io_service, duration_type timeout)
       : _socket(io_service),
@@ -33,7 +37,7 @@ namespace tcp {
         _strand(io_service) {}
 
     /// Starts the session and calls @a callback after successfully reading the
-    /// token.
+    /// stream id.
     ///
     /// @pre Callback function signature:
     /// `void(std::shared_ptr<ServerSession>)`.
@@ -45,34 +49,34 @@ namespace tcp {
       auto handle_query = [this, self, callback](
           const error_code &ec,
           size_t DEBUG_ONLY(bytes_received)) {
-        DEBUG_ASSERT(bytes_received == sizeof(_token));
+        DEBUG_ASSERT_EQ(bytes_received, sizeof(_stream_id));
         if (!ec || ec == boost::asio::error::message_size) {
-          log_debug("session{ stream", _token, "} started");
+          log_debug("session{ stream", _stream_id, "} started");
           _socket.get_io_service().post([=]() { callback(self); });
         } else {
-          log_error("session{ stream", _token, "} error opening session :", ec.message());
+          log_error("session{ stream", _stream_id, "} error opening session :", ec.message());
           Close();
         }
       };
 
-      // Read the token.
+      // Read the stream id.
       _deadline.expires_from_now(_timeout);
       _socket.async_receive(
-          boost::asio::buffer(&_token, sizeof(_token)),
+          boost::asio::buffer(&_stream_id, sizeof(_stream_id)),
           _strand.wrap(handle_query));
 
       StartTimer();
     }
 
-    token_type GetToken() const {
-      // Note that the token isn't synchronized. This function should only be
-      // called from the @a callback function, and after that point the token
+    stream_id_type get_stream_id() const {
+      // Note that the stream id isn't synchronized. This function should only be
+      // called from the @a callback function, and after that point the stream_id
       // can't change.
-      return _token;
+      return _stream_id;
     }
 
     /// Writes some data to the socket.
-    void Write(std::shared_ptr<Message> message) {
+    void Write(std::shared_ptr<const Message> message) {
       auto self = shared_from_this();
       using boost::system::error_code;
 
@@ -81,7 +85,7 @@ namespace tcp {
       // optimized away.
       auto handle_sent = [self, message](const error_code &ec, size_t) {
         if (ec) {
-          log_error("session{ stream", self->_token, "} error sending data :", ec.message());
+          log_error("session{ stream", self->_stream_id, "} error sending data :", ec.message());
         }
       };
 
@@ -94,7 +98,7 @@ namespace tcp {
         if (_socket.is_open()) {
           _socket.close();
         }
-        log_debug("session { stream", _token, "} closed");
+        log_debug("session { stream", _stream_id, "} closed");
       });
     }
 
@@ -102,7 +106,7 @@ namespace tcp {
 
     void StartTimer() {
       if (_deadline.expires_at() <= boost::asio::deadline_timer::traits_type::now()) {
-        log_debug("session { stream", _token, "} timed out");
+        log_debug("session { stream", _stream_id, "} timed out");
         Close();
       } else {
         _deadline.async_wait([self = shared_from_this()](boost::system::error_code) {
@@ -113,7 +117,7 @@ namespace tcp {
 
     friend class Server;
 
-    token_type _token = 0u;
+    stream_id_type _stream_id = 0u;
 
     socket_type _socket;
 
@@ -125,5 +129,6 @@ namespace tcp {
   };
 
 } // namespace tcp
+} // namespace low_level
 } // namespace streaming
 } // namespace carla

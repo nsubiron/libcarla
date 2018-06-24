@@ -46,10 +46,15 @@ namespace logging {
 
   // https://stackoverflow.com/a/27375675
   template <typename Arg, typename ... Args>
-  static void print(std::ostream &out, Arg &&arg, Args && ... args) {
+  static void write_to_stream(std::ostream &out, Arg &&arg, Args && ... args) {
     out << std::boolalpha << std::forward<Arg>(arg);
     using expander = int[];
     (void) expander{0, (void(out << ' ' << std::forward<Args>(args)), 0) ...};
+  }
+
+  template <typename ... Args>
+  static inline void log(Args && ... args) {
+    logging::write_to_stream(std::cout, std::forward<Args>(args) ..., '\n');
   }
 
 } // namespace logging
@@ -58,7 +63,7 @@ namespace logging {
 
   template <typename ... Args>
   static inline void log_debug(Args && ... args) {
-    logging::print(std::cout, "DEBUG:", std::forward<Args>(args) ..., '\n');
+    logging::write_to_stream(std::cout, "DEBUG:", std::forward<Args>(args) ..., '\n');
   }
 
 #else
@@ -72,7 +77,7 @@ namespace logging {
 
   template <typename ... Args>
   static inline void log_info(Args && ... args) {
-    logging::print(std::cout, "INFO: ", std::forward<Args>(args) ..., '\n');
+    logging::write_to_stream(std::cout, "INFO: ", std::forward<Args>(args) ..., '\n');
   }
 
 #else
@@ -86,7 +91,7 @@ namespace logging {
 
   template <typename ... Args>
   static inline void log_warning(Args && ... args) {
-    logging::print(std::cerr, "WARNING:", std::forward<Args>(args) ..., '\n');
+    logging::write_to_stream(std::cerr, "WARNING:", std::forward<Args>(args) ..., '\n');
   }
 
 #else
@@ -100,7 +105,7 @@ namespace logging {
 
   template <typename ... Args>
   static inline void log_error(Args && ... args) {
-    logging::print(std::cerr, "ERROR:", std::forward<Args>(args) ..., '\n');
+    logging::write_to_stream(std::cerr, "ERROR:", std::forward<Args>(args) ..., '\n');
   }
 
 #else
@@ -114,7 +119,7 @@ namespace logging {
 
   template <typename ... Args>
   static inline void log_critical(Args && ... args) {
-    logging::print(std::cerr, "CRITICAL:", std::forward<Args>(args) ..., '\n');
+    logging::write_to_stream(std::cerr, "CRITICAL:", std::forward<Args>(args) ..., '\n');
   }
 
 #else

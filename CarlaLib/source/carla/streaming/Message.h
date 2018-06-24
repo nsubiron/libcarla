@@ -13,10 +13,12 @@
 namespace carla {
 namespace streaming {
 
+namespace low_level {
 namespace tcp {
 
   class Client; /// @todo
 
+} // namespace low_level
 } // namespace tcp
 
   /// A message owns a buffer with raw data.
@@ -112,17 +114,13 @@ namespace tcp {
       return {boost::asio::buffer(&_size, sizeof(_size)), buffer()};
     }
 
-    std::string reinterpret_as_string() const {
-      return {reinterpret_cast<const char *>(data()), size()};
-    }
-
     // =========================================================================
     // -- Private members ------------------------------------------------------
     // =========================================================================
 
   private:
 
-    friend class tcp::Client; /// @todo
+    friend class low_level::tcp::Client; /// @todo
 
     size_type _size = 0u;
 

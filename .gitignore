@@ -23,6 +23,7 @@ Install
 *CodeLitePreProcessor.txt
 .codelite
 .gdb_history
+.profiler.csv
 .tags*
 .vs
 __pycache__

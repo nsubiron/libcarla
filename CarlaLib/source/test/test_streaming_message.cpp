@@ -6,13 +6,13 @@
 #include <string>
 #include <vector>
 
-using carla::streaming::Message;
+using namespace util::message;
 
 TEST(streaming_message, to_from_string) {
   const std::string str = "The quick brown fox jumps over the lazy dog";
   Message msg(boost::asio::buffer(str));
   ASSERT_EQ(msg.size(), str.size());
-  const std::string result = msg.reinterpret_as_string();
+  const std::string result = as_string(msg);
   ASSERT_EQ(result, str);
 }
 
@@ -37,7 +37,7 @@ TEST(streaming_message, memcpy) {
   ASSERT_EQ(msg.size(), str.size());
   auto buffer = msg.buffer();
   std::memcpy(buffer.data(), str.data(), buffer.size());
-  const std::string result = msg.reinterpret_as_string();
+  const std::string result = as_string(msg);
   ASSERT_EQ(result, str);
 }
 
