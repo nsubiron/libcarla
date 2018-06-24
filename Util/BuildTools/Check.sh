@@ -8,14 +8,15 @@ source $(dirname "$0")/Environment.sh
 
 DOC_STRING="Run unit tests."
 
-USAGE_STRING="Usage: $0 [-h|--help] [--all] [--carlalib-release] [--carlalib-debug] [--python-api-2] [--python-api-3]"
+USAGE_STRING="Usage: $0 [-h|--help] [--gdb] [--all] [--carlalib-release] [--carlalib-debug] [--python-api-2] [--python-api-3]"
 
+GDB=
 CARLALIB_RELEASE=false
 CARLALIB_DEBUG=false
 PYTHON_API_2=false
 PYTHON_API_3=false
 
-OPTS=`getopt -o h --long help,all,carlalib-release,carlalib-debug,python-api-2,python-api-3 -n 'parse-options' -- "$@"`
+OPTS=`getopt -o h --long help,gdb,all,carlalib-release,carlalib-debug,python-api-2,python-api-3 -n 'parse-options' -- "$@"`
 
 if [ $? != 0 ] ; then echo "$USAGE_STRING" ; exit 2 ; fi
 
@@ -23,6 +24,9 @@ eval set -- "$OPTS"
 
 while true; do
   case "$1" in
+    --gdb )
+      GDB="gdb --args"
+      shift ;;
     --all )
       CARLALIB_RELEASE=true;
       CARLALIB_DEBUG=true;
@@ -63,7 +67,7 @@ if ${CARLALIB_DEBUG} ; then
 
   log "Running CarlaLib unit tests debug."
 
-  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_debug
+  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${GDB} ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_debug
 
 fi
 
@@ -71,7 +75,7 @@ if ${CARLALIB_RELEASE} ; then
 
   log "Running CarlaLib unit tests release."
 
-  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_release
+  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${GDB} ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_release
 
 fi
 

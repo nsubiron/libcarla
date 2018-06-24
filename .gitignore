@@ -22,6 +22,7 @@ Install
 *CodeCompletionFolders.txt
 *CodeLitePreProcessor.txt
 .codelite
+.gdb_history
 .tags*
 .vs
 __pycache__

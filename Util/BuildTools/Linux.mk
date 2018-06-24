@@ -1,3 +1,5 @@
+ARGS=--all
+
 default: help
 
 help:
@@ -14,7 +16,7 @@ package: CarlaUE4Editor PythonAPI
 
 docs:
 	@doxygen
-	@echo "Documentation index at ./doxygen/html/index.html"
+	@echo "Documentation index at ./Doxygen/html/index.html"
 
 clean:
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --clean
@@ -31,7 +33,7 @@ hard-clean: clean
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --hard-clean
 
 check: PythonAPI
-	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --all
+	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh $(ARGS)
 
 CarlaUE4Editor: CarlaLib
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --build

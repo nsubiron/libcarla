@@ -7,7 +7,7 @@
 #pragma once
 
 #ifndef NDEBUG
-#include <cassert>
+#  include <cassert>
 #endif // NDEBUG
 
 #ifdef NDEBUG
