@@ -8,14 +8,29 @@ CURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 source $(dirname "$0")/Vars.mk
 unset CURDIR
 
-function log {
-  echo -e "\033[1;35m`basename "$0"`: $1\033[0m"
-}
+if [ -n "${CARLA_BUILD_NO_COLOR}" ]; then
 
-function fatal_error {
-  echo -e >&2 "\033[0;31m`basename "$0"`: ERROR: $1\033[0m"
-  exit 2
-}
+  function log {
+      echo "`basename "$0"`: $1"
+  }
+
+  function fatal_error {
+    echo -e >&2 "`basename "$0"`: ERROR: $1"
+    exit 2
+  }
+
+else
+
+  function log {
+      echo -e "\033[1;35m`basename "$0"`: $1\033[0m"
+  }
+
+  function fatal_error {
+    echo -e >&2 "\033[0;31m`basename "$0"`: ERROR: $1\033[0m"
+    exit 2
+  }
+
+fi
 
 function get_carla_version {
   git describe --tags --dirty --always
