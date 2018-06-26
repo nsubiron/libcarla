@@ -24,8 +24,8 @@ TEST(streaming_low_level, sending_strings) {
 
   auto stream = srv.MakeStream();
 
-  Client<tcp::Client> c(io_service, stream.token());
-  c.Subscribe([&](auto message) {
+  Client<tcp::Client> c;
+  c.Subscribe(io_service, stream.token(), [&](auto message) {
     ++message_count;
     ASSERT_NE(message, nullptr);
     ASSERT_EQ(message->size(), message_text.size());

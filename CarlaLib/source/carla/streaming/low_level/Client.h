@@ -4,38 +4,41 @@
 
 #include <boost/asio/io_service.hpp>
 
+#include <unordered_set>
+
 namespace carla {
 namespace streaming {
 namespace low_level {
 
-  /// Wrapper around low level clients.
+  /// Wrapper around low level clients. You can subscribe to multiple streams.
+  ///
+  /// @warning The client should not be destroyed before the @a io_service is
+  /// stopped.
+  /// @pre T has to be hashable.
   template <typename T>
   class Client {
-
-    static auto get_endpoint(const token_type &token) {
-      if (!token.protocol_is_tcp())
-        throw std::invalid_argument("invalid token, only TCP tokens supported");
-      return token.to_tcp_endpoint();
-    }
-
   public:
 
     using underlying_client = T;
 
-    explicit Client(boost::asio::io_service &io_service, const token_type &token)
-      : _client(io_service, get_endpoint(token)),
-        _stream_token(token.get_stream_id()) {}
-
-    template <typename F>
-    void Subscribe(F &&callback) {
-      _client.Subscribe(_stream_token, std::forward<F>(callback));
+    template <typename Functor>
+    void Subscribe(
+        boost::asio::io_service &io_service,
+        const token_type &token,
+        Functor &&callback) {
+      if (!token.protocol_is_tcp()) {
+        throw std::invalid_argument("invalid token, only TCP tokens supported");
+      }
+      _clients.emplace(
+          io_service,
+          token.to_tcp_endpoint(),
+          token.get_stream_id(),
+          std::forward<Functor>(callback));
     }
 
   private:
 
-    underlying_client _client;
-
-    const stream_id_type _stream_token;
+    std::unordered_set<underlying_client> _clients;
   };
 
 } // namespace low_level

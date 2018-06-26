@@ -25,7 +25,7 @@ before_install:
   - pip3 install --user setuptools nose2
 
 script:
-  - make check
+  - make check ARGS="--all --gtest_args=--gtest_filter=-*_mt"
 
 notifications:
   email: false

@@ -4,7 +4,6 @@
 
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/spawn.hpp>
 
 #include <atomic>
 #include <memory>

@@ -10,7 +10,10 @@ namespace carla {
 namespace streaming {
 
   class Server {
+    using underlying_server = low_level::Server<low_level::tcp::Server>;
   public:
+
+    using duration_type = underlying_server::duration_type;
 
     explicit Server(uint16_t port)
       : _server(_io_service, port) {}
@@ -22,6 +25,10 @@ namespace streaming {
       Stop();
     }
 
+    void set_timeout(duration_type timeout) {
+      _server.set_timeout(timeout);
+    }
+
     Stream MakeStream() {
       return _server.MakeStream();
     }
@@ -30,7 +37,7 @@ namespace streaming {
       _io_service.run();
     }
 
-    void AsyncRun(std::size_t worker_threads) {
+    void AsyncRun(size_t worker_threads) {
       _workers.CreateThreads(worker_threads, [this](){ Run(); });
     }
 
@@ -43,7 +50,7 @@ namespace streaming {
 
     boost::asio::io_service _io_service;
 
-    low_level::Server<low_level::tcp::Server> _server;
+    underlying_server _server;
 
     ThreadGroup _workers;
   };

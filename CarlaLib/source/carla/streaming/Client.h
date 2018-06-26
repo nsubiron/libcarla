@@ -11,27 +11,25 @@ namespace streaming {
 
   using stream_token = low_level::token_type;
 
+  /// With this client you can subscribe to multiple streams.
   class Client {
   public:
-
-    explicit Client(const stream_token &token)
-      : _client(_io_service, token) {}
 
     ~Client() {
       Stop();
     }
 
-    template <typename F>
-    void Listen(F &&callback) {
-      _client.Subscribe(std::forward<F>(callback));
+    template <typename Functor>
+    void Subscribe(const stream_token &token, Functor &&callback) {
+      _client.Subscribe(_io_service, token, std::forward<Functor>(callback));
     }
 
     void Run() {
       _io_service.run();
     }
 
-    void AsyncRun(std::size_t worker_threads) {
-      _workers.CreateThreads(worker_threads, [this](){ Run(); });
+    void AsyncRun(size_t worker_threads) {
+      _workers.CreateThreads(worker_threads, [this]() { Run(); });
     }
 
     void Stop() {
@@ -41,11 +39,13 @@ namespace streaming {
 
   private:
 
+    using underlying_client = low_level::Client<low_level::tcp::Client>;
+
     boost::asio::io_service _io_service;
 
-    low_level::Client<low_level::tcp::Client> _client;
-
     ThreadGroup _workers;
+
+    underlying_client _client;
   };
 
 } // namespace streaming

@@ -9,7 +9,9 @@
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/read.hpp>
 #include <boost/asio/strand.hpp>
+#include <boost/asio/write.hpp>
 
 #include <array>
 #include <memory>
@@ -18,6 +20,12 @@ namespace carla {
 namespace streaming {
 namespace low_level {
 namespace tcp {
+
+namespace detail {
+
+  static std::atomic_size_t SESSION_COUNTER{0u};
+
+} // namespace detail
 
   /// A TCP server session. When a session opens, it reads from the socket a
   /// stream id object and passes itself to the callback functor. The session
@@ -31,10 +39,15 @@ namespace tcp {
     using duration_type = timeout_type;
 
     explicit ServerSession(boost::asio::io_service &io_service, duration_type timeout)
-      : _socket(io_service),
+      : _session_id(detail::SESSION_COUNTER++),
+        _socket(io_service),
         _timeout(timeout),
         _deadline(io_service),
         _strand(io_service) {}
+
+    ~ServerSession() {
+      _deadline.cancel();
+    }
 
     /// Starts the session and calls @a callback after successfully reading the
     /// stream id.
@@ -43,29 +56,30 @@ namespace tcp {
     /// `void(std::shared_ptr<ServerSession>)`.
     template <typename Functor>
     void Open(Functor callback) {
-      auto self = shared_from_this(); // To keep myself alive.
-      using boost::system::error_code;
-
-      auto handle_query = [this, self, callback](
-          const error_code &ec,
-          size_t DEBUG_ONLY(bytes_received)) {
-        DEBUG_ASSERT_EQ(bytes_received, sizeof(_stream_id));
-        if (!ec || ec == boost::asio::error::message_size) {
-          log_debug("session{ stream", _stream_id, "} started");
-          _socket.get_io_service().post([=]() { callback(self); });
-        } else {
-          log_error("session{ stream", _stream_id, "} error opening session :", ec.message());
-          Close();
-        }
-      };
-
-      // Read the stream id.
-      _deadline.expires_from_now(_timeout);
-      _socket.async_receive(
-          boost::asio::buffer(&_stream_id, sizeof(_stream_id)),
-          _strand.wrap(handle_query));
-
       StartTimer();
+      auto self = shared_from_this(); // To keep myself alive.
+      _strand.post([=]() {
+
+        auto handle_query = [this, self, callback](
+            const boost::system::error_code &ec,
+            size_t DEBUG_ONLY(bytes_received)) {
+          DEBUG_ASSERT_EQ(bytes_received, sizeof(_stream_id));
+          if (!ec) {
+            log_debug("session", _session_id, "for stream", _stream_id, " started");
+            _socket.get_io_service().post([=]() { callback(self); });
+          } else {
+            log_error("session", _session_id, ": error retrieving stream id :", ec.message());
+            Close();
+          }
+        };
+
+        // Read the stream id.
+        _deadline.expires_from_now(_timeout);
+        boost::asio::async_read(
+            _socket,
+            boost::asio::buffer(&_stream_id, sizeof(_stream_id)),
+            _strand.wrap(handle_query));
+      });
     }
 
     stream_id_type get_stream_id() const {
@@ -78,27 +92,42 @@ namespace tcp {
     /// Writes some data to the socket.
     void Write(std::shared_ptr<const Message> message) {
       auto self = shared_from_this();
-      using boost::system::error_code;
+      _strand.post([=]() {
 
-      // Explicitly capturing both objects we ensure they live as long as this
-      // lambda. The standard guarantees that explicit captures are not
-      // optimized away.
-      auto handle_sent = [self, message](const error_code &ec, size_t) {
-        if (ec) {
-          log_error("session{ stream", self->_stream_id, "} error sending data :", ec.message());
+        /// @todo has to be a better way of doing this...
+        if (_is_writing) {
+          // Repost and return;
+          Write(std::move(message));
+          return;
         }
-      };
+        _is_writing = true;
 
-      _deadline.expires_from_now(_timeout);
-      _socket.async_send(message->encode(), _strand.wrap(handle_sent));
+        auto handle_sent = [this, self, message](const boost::system::error_code &ec, size_t DEBUG_ONLY(bytes)) {
+          _is_writing = false;
+          if (ec) {
+            log_error("session", _session_id, ": error sending data :", ec.message());
+          } else {
+            DEBUG_ONLY(log_debug("session", _session_id, ": successfully sent", bytes, "bytes"));
+            DEBUG_ASSERT_EQ(bytes, sizeof(message_size_type) + message->size());
+          }
+        };
+
+        log_debug("session", _session_id, ": sending message of", message->size(), "bytes");
+
+        _deadline.expires_from_now(_timeout);
+        boost::asio::async_write(
+            _socket,
+            message->encode(),
+            _strand.wrap(handle_sent));
+      });
     }
 
     void Close() {
-      _strand.post([self = shared_from_this(), this]() {
+      _strand.post([this, self = shared_from_this()]() {
         if (_socket.is_open()) {
           _socket.close();
         }
-        log_debug("session { stream", _stream_id, "} closed");
+        log_debug("session", _session_id, "closed");
       });
     }
 
@@ -106,16 +135,18 @@ namespace tcp {
 
     void StartTimer() {
       if (_deadline.expires_at() <= boost::asio::deadline_timer::traits_type::now()) {
-        log_debug("session { stream", _stream_id, "} timed out");
+        log_debug("session", _session_id, "timed out");
         Close();
       } else {
         _deadline.async_wait([self = shared_from_this()](boost::system::error_code) {
           self->StartTimer();
         });
       }
-    }
+     }
 
     friend class Server;
+
+    const size_t _session_id;
 
     stream_id_type _stream_id = 0u;
 
@@ -126,6 +157,8 @@ namespace tcp {
     boost::asio::deadline_timer _deadline;
 
     boost::asio::io_service::strand _strand;
+
+    bool _is_writing = false;
   };
 
 } // namespace tcp

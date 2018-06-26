@@ -30,9 +30,7 @@ TEST(streaming_low_level_tcp, small_message) {
     std::cout << "done!\n";
   });
 
-  tcp::Client c(io_service, ep);
-
-  c.Subscribe(42u, [&](std::shared_ptr<Message> message) {
+  tcp::Client c(io_service, ep, 42u, [&](std::shared_ptr<Message> message) {
     ++message_count;
     ASSERT_NE(message, nullptr);
     ASSERT_EQ(message->size(), 5u);
