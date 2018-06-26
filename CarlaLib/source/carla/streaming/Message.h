@@ -84,6 +84,10 @@ namespace tcp {
 
   public:
 
+    bool empty() const {
+      return _size == 0u;
+    }
+
     size_type size() const {
       return _size;
     }
@@ -111,6 +115,7 @@ namespace tcp {
     }
 
     std::array<boost::asio::const_buffer, 2u> encode() const {
+      DEBUG_ASSERT(!empty());
       return {boost::asio::buffer(&_size, sizeof(_size)), buffer()};
     }
 

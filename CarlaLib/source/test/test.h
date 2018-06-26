@@ -1,6 +1,8 @@
 #pragma once
 
-#define CARLALIB_LOG_LEVEL CARLALIB_LOG_LEVEL_DEBUG
+#ifndef NDEBUG
+#  define CARLALIB_LOG_LEVEL CARLALIB_LOG_LEVEL_INFO
+#endif // NDEBUG
 
 #include "test/util/Message.h"
 

@@ -35,6 +35,10 @@ hard-clean: clean
 check: PythonAPI
 	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh $(ARGS)
 
+benchmark: CarlaLib
+	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --benchmark
+	@cat .profiler.csv
+
 CarlaUE4Editor: CarlaLib
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --build
 

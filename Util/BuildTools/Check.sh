@@ -8,15 +8,29 @@ source $(dirname "$0")/Environment.sh
 
 DOC_STRING="Run unit tests."
 
-USAGE_STRING="Usage: $0 [-h|--help] [--gdb] [--all] [--carlalib-release] [--carlalib-debug] [--python-api-2] [--python-api-3]"
+USAGE_STRING=$(cat <<- END
+Usage: $0 [-h|--help] [--gdb] [--gtest_args=ARGS]
+
+Then either ran all the tests
+
+    [--all]
+
+Or choose one or more of the following
+
+    [--carlalib-release] [--carlalib-debug]
+    [--python-api-2] [--python-api-3]
+    [--benchmark]
+END
+)
 
 GDB=
+GTEST_ARGS=
 CARLALIB_RELEASE=false
 CARLALIB_DEBUG=false
 PYTHON_API_2=false
 PYTHON_API_3=false
 
-OPTS=`getopt -o h --long help,gdb,all,carlalib-release,carlalib-debug,python-api-2,python-api-3 -n 'parse-options' -- "$@"`
+OPTS=`getopt -o h --long help,gdb,gtest_args:,all,carlalib-release,carlalib-debug,python-api-2,python-api-3,benchmark -n 'parse-options' -- "$@"`
 
 if [ $? != 0 ] ; then echo "$USAGE_STRING" ; exit 2 ; fi
 
@@ -25,7 +39,10 @@ eval set -- "$OPTS"
 while true; do
   case "$1" in
     --gdb )
-      GDB="gdb --args"
+      GDB="gdb --args";
+      shift ;;
+    --gtest_args )
+      GTEST_ARGS="$2";
       shift ;;
     --all )
       CARLALIB_RELEASE=true;
@@ -45,9 +62,13 @@ while true; do
     --python-api-3 )
       PYTHON_API_3=true;
       shift ;;
+    --benchmark )
+      CARLALIB_RELEASE=true;
+      GTEST_ARGS="--gtest_filter=benchmark*";
+      shift ;;
     -h | --help )
       echo "$DOC_STRING"
-      echo "$USAGE_STRING"
+      echo -e "$USAGE_STRING"
       exit 1
       ;;
     * )
@@ -67,7 +88,7 @@ if ${CARLALIB_DEBUG} ; then
 
   log "Running CarlaLib unit tests debug."
 
-  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${GDB} ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_debug
+  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${GDB} ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_debug ${GTEST_ARGS}
 
 fi
 
@@ -75,7 +96,7 @@ if ${CARLALIB_RELEASE} ; then
 
   log "Running CarlaLib unit tests release."
 
-  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${GDB} ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_release
+  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${GDB} ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_release ${GTEST_ARGS}
 
 fi
 

@@ -32,9 +32,14 @@ namespace detail {
     StaticProfiler(std::string filename)
       : _filename(std::move(filename)) {
       logging::log("PROFILER: writing profiling data to", _filename);
-      write_to_file(
-          std::ios_base::out,
-          std::string("# CarlaLib Profiler ") + carla::version());
+      std::string header = "# CarlaLib Profiler ";
+      header += carla::version();
+#ifdef NDEBUG
+      header += " (release)";
+#else
+      header += " (debug)";
+#endif // NDEBUG
+      write_to_file(std::ios_base::out, header);
       write_line("# context", "average", "maximum", "minimum", "units", "times");
     }
 
