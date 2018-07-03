@@ -15,14 +15,30 @@ actor in the scene
 import carla
 
 client = carla.Client('localhost', 8080)
+client.set_timeout(1000)
+
+print('client version: %s' % client.get_client_version())
+print('server version: %s' % client.get_server_version())
+
+world = client.get_world()
+
+blueprint = random.choice(world.get_blueprint_library())
 
 transform = carla.Transform(
-    carla.Location(x=5.0, y=4.0),
-    carla.Rotation(yaw=180))
+    carla.Location(x=-12.5, y=24.0, z=2.0),
+    carla.Rotation(yaw=-90))
 
-vehicle = client.spawn_vehicle(transform)
+actor = world.spawn_actor(blueprint, transform)
 
-vehicle.apply_control(carla.VehicleControl(throttle=1.0))
+while True:
+    control = carla.VehicleControl(
+        throttle=random.uniform(0.3, 1.0),
+        steer=random.uniform(-0.1, 0.1))
+
+    actor.apply_control(control)
+
+    time.sleep(1)
+
 ```
 
 ## Design
@@ -154,3 +170,8 @@ sys.path.append(
 
 import carla
 ```
+
+or installed with `easy_install`
+
+    $ easy_install2 --user --no-deps PythonAPI/dist/carla-0.9.0-py2.7-linux-x86_64.egg
+    $ easy_install3 --user --no-deps PythonAPI/dist/carla-0.9.0-py3.5-linux-x86_64.egg
