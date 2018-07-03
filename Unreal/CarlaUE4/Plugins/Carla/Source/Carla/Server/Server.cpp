@@ -21,27 +21,17 @@ void AServer::BeginPlay()
   _Server.Run();
 }
 
+void AServer::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+  _Server.Stop();
+}
+
 // Called every frame
 void AServer::Tick(float DeltaTime)
 {
   Super::Tick(DeltaTime);
 
-  std::lock_guard<std::mutex> guard(_Mutex);
-  if (_SpawnQueue.empty())
-    return;
-
-  auto task = _SpawnQueue.front();
-  _SpawnQueue.pop();
-  task.second->set_value(SpawnAgent(task.first));
-}
-
-std::future<int32_t> AServer::SpawnAgentAsync(const FTransform &Transform)
-{
-  std::lock_guard<std::mutex> guard(_Mutex);
-  auto Promise = std::make_shared<IdPromise>();
-  auto future = Promise->get_future();
-  _SpawnQueue.push(std::make_pair(Transform, Promise));
-  return future;
+  _Server.RunSome();
 }
 
 int32 AServer::SpawnAgent(const FTransform &Transform)

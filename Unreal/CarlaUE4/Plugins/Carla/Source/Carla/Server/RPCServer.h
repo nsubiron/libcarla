@@ -20,6 +20,10 @@ public:
 
   void Run();
 
+  void RunSome();
+
+  void Stop();
+
 private:
 
   class Pimpl;

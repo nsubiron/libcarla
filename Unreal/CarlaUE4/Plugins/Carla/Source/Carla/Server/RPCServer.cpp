@@ -5,26 +5,14 @@
 
 #include <compiler/disable-ue4-macros.h>
 #include <carla/Version.h>
-#include <carla/networking/Transform.h>
-#include <carla/networking/VehicleControl.h>
-#include <rpc/server.h>
+#include <carla/rpc/Actor.h>
+#include <carla/rpc/ActorBlueprint.h>
+#include <carla/rpc/Server.h>
+#include <carla/rpc/Transform.h>
+#include <carla/rpc/VehicleControl.h>
 #include <compiler/enable-ue4-macros.h>
 
-static FTransform MakeTransform(const carla::networking::Transform &cTransform)
-{
-  FVector Translation(
-      cTransform.location.x,
-      cTransform.location.y,
-      cTransform.location.z);
-  FRotator Rotation(
-      cTransform.rotation.pitch,
-      cTransform.rotation.yaw,
-      cTransform.rotation.roll);
-  FVector Scale(1.0f, 1.0f, 1.0f);
-  return FTransform(Rotation, Translation, Scale);
-}
-
-static FVehicleControl MakeControl(const carla::networking::VehicleControl &cControl)
+static FVehicleControl MakeControl(const carla::rpc::VehicleControl &cControl)
 {
   FVehicleControl Control;
   Control.Throttle = cControl.throttle;
@@ -39,7 +27,7 @@ class FRPCServer::Pimpl
 {
 public:
   Pimpl(uint16_t port) : Server(port) {}
-  rpc::server Server;
+  carla::rpc::Server Server;
 };
 
 FRPCServer::FRPCServer() : _Pimpl(nullptr) {}
@@ -50,34 +38,50 @@ void FRPCServer::Initialize(AServer &Server, uint16_t Port)
 {
   UE_LOG(LogTemp, Error, TEXT("Initializing rpc-server at port %d"), Port);
 
-  // try {
-    _Pimpl = std::make_unique<Pimpl>(Port);
-  // } catch (const std::exception &e) {
-  //   UE_LOG(LogTemp, Error, TEXT("Exception thrown"));
-  //   UE_LOG(LogTemp, Error, TEXT("%s"), e.what());
-  //   return;
-  // }
+  _Pimpl = std::make_unique<Pimpl>(Port);
 
-  namespace cn = carla::networking;
+  namespace cr = carla::rpc;
 
   auto &srv = _Pimpl->Server;
 
-  srv.suppress_exceptions(true);
+  srv.BindAsync("ping", []() { return true; });
 
-  srv.bind("ping", [](){ return true; });
+  srv.BindAsync("version", []() { return std::string(carla::version()); });
 
-  srv.bind("version", [](){ return std::string(carla::version()); });
-
-  srv.bind("spawn", [&](cn::Transform transform) -> int32_t {
-    return Server.SpawnAgentAsync(MakeTransform(transform)).get();
+  srv.BindAsync("get_blueprints", []() {
+    return std::vector<cr::ActorBlueprint>{
+      cr::ActorBlueprint{"vehicle.mustang.red"},
+      cr::ActorBlueprint{"vehicle.mustang.also_red"},
+      cr::ActorBlueprint{"vehicle.mustang.still_red"}
+    };
   });
 
-  srv.bind("control", [&](int32 id, const cn::VehicleControl &control) {
-    return Server.ApplyControl(id, MakeControl(control));
+  srv.BindSync("spawn_actor", [&](
+      const cr::ActorBlueprint &blueprint,
+      const cr::Transform &transform) {
+    auto id = Server.SpawnAgent(transform);
+    return cr::Actor{static_cast<cr::Actor::id_type>(id), blueprint};
+  });
+
+  srv.BindSync("apply_control_to_actor", [&](
+      const cr::Actor &actor,
+      const cr::VehicleControl &control) {
+    Server.ApplyControl(actor.id, MakeControl(control));
   });
 }
 
 void FRPCServer::Run()
 {
-  _Pimpl->Server.async_run(4);
+  _Pimpl->Server.AsyncRun(4);
+}
+
+void FRPCServer::RunSome()
+{
+  using namespace std::chrono_literals;
+  _Pimpl->Server.SyncRunFor(20ms);
+}
+
+void FRPCServer::Stop()
+{
+  _Pimpl->Server.Stop();
 }

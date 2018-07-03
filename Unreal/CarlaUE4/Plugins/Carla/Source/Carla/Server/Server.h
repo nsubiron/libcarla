@@ -24,12 +24,11 @@ public:
 protected:
   // Called when the game starts or when spawned
   virtual void BeginPlay() override;
+  virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 public:
   // Called every frame
   virtual void Tick(float DeltaTime) override;
-
-  std::future<int32_t> SpawnAgentAsync(const FTransform &Transform);
 
   UFUNCTION(BlueprintCallable)
   int32 SpawnAgent(const FTransform &Transform);
@@ -46,10 +45,4 @@ private:
 
   UPROPERTY(VisibleAnywhere)
   TMap<uint32, ACarlaWheeledVehicle *> _Agents;
-
-  mutable std::mutex _Mutex;
-
-  using IdPromise = std::promise<int32_t>;
-  using Task = std::pair<FTransform, std::shared_ptr<IdPromise>>;
-  std::queue<Task> _SpawnQueue;
 };

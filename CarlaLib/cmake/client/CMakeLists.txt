@@ -6,8 +6,8 @@ install(DIRECTORY "${RPCLIB_INCLUDE_PATH}/rpc" DESTINATION include)
 install(FILES "${RPCLIB_LIB_PATH}/librpc.a" DESTINATION lib)
 
 file(GLOB_RECURSE carlalib_client_sources
-    "${carlalib_source_path}/carla/networking/client/*.h"
-    "${carlalib_source_path}/carla/networking/client/*.cpp")
+    "${carlalib_source_path}/carla/client/*.h"
+    "${carlalib_source_path}/carla/client/*.cpp")
 
 # Create targets for debug and release in the same build type.
 foreach(target carla_client_debug carla_client)
@@ -28,13 +28,15 @@ target_compile_definitions(carla_client_debug PUBLIC -DBOOST_ASIO_ENABLE_BUFFER_
 set_target_properties(carla_client PROPERTIES COMPILE_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
 
 # Install headers.
-install(FILES "${carlalib_source_path}/carla/MsgPack.h"                   DESTINATION include/carla)
-install(FILES "${carlalib_source_path}/carla/Version.h"                   DESTINATION include/carla)
-install(FILES "${carlalib_source_path}/carla/networking/Networking.h"     DESTINATION include/carla/networking)
-install(FILES "${carlalib_source_path}/carla/networking/Transform.h"      DESTINATION include/carla/networking)
-install(FILES "${carlalib_source_path}/carla/networking/VehicleControl.h" DESTINATION include/carla/networking)
-install(FILES "${carlalib_source_path}/carla/networking/ClientFwdDcl.h"   DESTINATION include/carla/networking)
-install(FILES "${carlalib_source_path}/carla/networking/Client.h"         DESTINATION include/carla/networking)
 
-file(GLOB carlalib_client_headers "${carlalib_source_path}/carla/networking/client/*.h")
-install(FILES ${carlalib_client_headers} DESTINATION include/carla/networking/client)
+file(GLOB carlalib_carla_headers "${carlalib_source_path}/carla/*.h")
+install(FILES ${carlalib_carla_headers} DESTINATION include/carla)
+
+file(GLOB carlalib_carla_client_headers "${carlalib_source_path}/carla/client/*.h")
+install(FILES ${carlalib_carla_client_headers} DESTINATION include/carla/client)
+
+file(GLOB carlalib_carla_rpc_headers "${carlalib_source_path}/carla/rpc/*.h")
+install(FILES ${carlalib_carla_rpc_headers} DESTINATION include/carla/rpc)
+
+file(GLOB carlalib_carla_streaming_headers "${carlalib_source_path}/carla/streaming/*.h")
+install(FILES ${carlalib_carla_streaming_headers} DESTINATION include/carla/streaming)

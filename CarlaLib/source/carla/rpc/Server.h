@@ -1,8 +1,8 @@
 #pragma once
 
-#include <rpc/server.h>
-
 #include <boost/asio/io_service.hpp>
+
+#include <rpc/server.h>
 
 namespace carla {
 namespace rpc {
@@ -68,10 +68,8 @@ namespace detail {
 
     template <typename ... Args>
     explicit Server(Args && ... args)
-      : _server(std::forward<Args>(args) ...) {}
-
-    void SuppressExceptions(bool suppress) {
-      _server.suppress_exceptions(suppress);
+      : _server(std::forward<Args>(args) ...) {
+      _server.suppress_exceptions(true);
     }
 
     template <typename Functor>

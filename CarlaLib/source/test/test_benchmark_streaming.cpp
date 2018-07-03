@@ -94,7 +94,7 @@ private:
 
   std::vector<Stream> _streams;
 
-  std::atomic_size_t _number_of_messages_received = 0u;
+  std::atomic_size_t _number_of_messages_received{0u};
 };
 
 static void benchmark_image(

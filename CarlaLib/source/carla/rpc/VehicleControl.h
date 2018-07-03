@@ -1,9 +1,9 @@
 #pragma once
 
-#include "carla/MsgPack.h"
+#include "carla/rpc/MsgPack.h"
 
 namespace carla {
-namespace networking {
+namespace rpc {
 
   class VehicleControl {
   public:
@@ -36,5 +36,5 @@ namespace networking {
         reverse);
   };
 
+} // namespace rpc
 } // namespace carla
-} // namespace networking
