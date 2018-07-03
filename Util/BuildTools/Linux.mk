@@ -37,7 +37,7 @@ check: PythonAPI
 
 benchmark: LibCarla
 	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --benchmark
-	@cat .profiler.csv
+	@cat profiler.csv
 
 CarlaUE4Editor: LibCarla
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --build

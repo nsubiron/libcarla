@@ -65,7 +65,7 @@ namespace detail {
   };
 
   ProfilerData::~ProfilerData() {
-    static StaticProfiler PROFILER{".profiler.csv"};
+    static StaticProfiler PROFILER{"profiler.csv"};
     if (_count > 0u) {
       if (_print_fps) {
         PROFILER.write_line(_name, fps(average()), fps(minimum()), fps(maximum()), "FPS", _count);
