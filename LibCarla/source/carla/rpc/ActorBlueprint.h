@@ -2,9 +2,9 @@
 
 #include "carla/rpc/MsgPack.h"
 
-#ifdef CARLALIB_INCLUDED_FROM_UE4
+#ifdef LIBCARLA_INCLUDED_FROM_UE4
 #  include "UnrealString.h"
-#endif // CARLALIB_INCLUDED_FROM_UE4
+#endif // LIBCARLA_INCLUDED_FROM_UE4
 
 #include <string>
 
@@ -23,7 +23,7 @@ namespace rpc {
     ActorBlueprint &operator=(const ActorBlueprint &) = default;
     ActorBlueprint &operator=(ActorBlueprint &&) = default;
 
-#ifdef CARLALIB_INCLUDED_FROM_UE4
+#ifdef LIBCARLA_INCLUDED_FROM_UE4
 
     // ActorBlueprint(const FString &Type)
     //   : type_id(TCHAR_TO_UTF8(*Type)) {}
@@ -32,7 +32,7 @@ namespace rpc {
       return FString(type_id.size(), UTF8_TO_TCHAR(type_id.c_str()));
     }
 
-#endif // CARLALIB_INCLUDED_FROM_UE4
+#endif // LIBCARLA_INCLUDED_FROM_UE4
 
     std::string type_id;
 

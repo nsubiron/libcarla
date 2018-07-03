@@ -2,9 +2,9 @@
 
 #include "carla/rpc/MsgPack.h"
 
-#ifdef CARLALIB_INCLUDED_FROM_UE4
+#ifdef LIBCARLA_INCLUDED_FROM_UE4
 #  include "Transform.h"
-#endif // CARLALIB_INCLUDED_FROM_UE4
+#endif // LIBCARLA_INCLUDED_FROM_UE4
 
 namespace carla {
 namespace rpc {
@@ -23,7 +23,7 @@ namespace rpc {
     float y = 0.0f;
     float z = 0.0f;
 
-#ifdef CARLALIB_INCLUDED_FROM_UE4
+#ifdef LIBCARLA_INCLUDED_FROM_UE4
 
     Location(const FVector &vector) // from centimeters to meters.
       : Location(1e-2f * vector.X, 1e-2f * vector.Y, 1e-2f * vector.Z) {}
@@ -32,7 +32,7 @@ namespace rpc {
       return FVector{1e2f * x, 1e2f * y, 1e2f * z}; // from meters to centimeters.
     }
 
-#endif // CARLALIB_INCLUDED_FROM_UE4
+#endif // LIBCARLA_INCLUDED_FROM_UE4
 
     MSGPACK_DEFINE_ARRAY(x, y, z);
   };
@@ -51,7 +51,7 @@ namespace rpc {
     float yaw = 0.0f;
     float roll = 0.0f;
 
-#ifdef CARLALIB_INCLUDED_FROM_UE4
+#ifdef LIBCARLA_INCLUDED_FROM_UE4
 
     Rotation(const FRotator &rotator)
       : Rotation(rotator.Pitch, rotator.Yaw, rotator.Roll) {}
@@ -60,7 +60,7 @@ namespace rpc {
       return FRotator{pitch, yaw, roll};
     }
 
-#endif // CARLALIB_INCLUDED_FROM_UE4
+#endif // LIBCARLA_INCLUDED_FROM_UE4
 
     MSGPACK_DEFINE_ARRAY(pitch, yaw, roll);
   };
@@ -77,7 +77,7 @@ namespace rpc {
     Location location;
     Rotation rotation;
 
-#ifdef CARLALIB_INCLUDED_FROM_UE4
+#ifdef LIBCARLA_INCLUDED_FROM_UE4
 
     Transform(const FTransform &transform)
       : Transform(Location(transform.GetLocation()), Rotation(transform.Rotator())) {}
@@ -87,7 +87,7 @@ namespace rpc {
       return FTransform{FRotator(rotation), FVector(location), scale};
     }
 
-#endif // CARLALIB_INCLUDED_FROM_UE4
+#endif // LIBCARLA_INCLUDED_FROM_UE4
 
     MSGPACK_DEFINE_ARRAY(location, rotation);
   };

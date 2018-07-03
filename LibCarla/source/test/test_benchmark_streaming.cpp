@@ -29,7 +29,7 @@ public:
       DEBUG_ASSERT_EQ(msg->size(), _message.size());
       DEBUG_ASSERT(*msg == _message);
       _client_callback.post([this]() {
-        CARLALIB_PROFILE_FPS(client, listen_callback);
+        CARLA_PROFILE_FPS(client, listen_callback);
         ++_number_of_messages_received;
       });
     });
@@ -54,7 +54,7 @@ public:
     for (auto &&stream : _streams) {
       _threads.CreateThread([=]() mutable {
         for (auto i = 0u; i < number_of_messages; ++i) {
-          CARLALIB_PROFILE_SCOPE(game, write_to_stream);
+          CARLA_PROFILE_SCOPE(game, write_to_stream);
           stream << _message.buffer();
         }
       });

@@ -1,6 +1,6 @@
-#ifndef CARLALIB_ENABLE_PROFILER
-#  define CARLALIB_ENABLE_PROFILER
-#endif // CARLALIB_ENABLE_PROFILER
+#ifndef LIBCARLA_ENABLE_PROFILER
+#  define LIBCARLA_ENABLE_PROFILER
+#endif // LIBCARLA_ENABLE_PROFILER
 
 #include "carla/Logging.h"
 #include "carla/Version.h"
@@ -32,7 +32,7 @@ namespace detail {
     StaticProfiler(std::string filename)
       : _filename(std::move(filename)) {
       logging::log("PROFILER: writing profiling data to", _filename);
-      std::string header = "# CarlaLib Profiler ";
+      std::string header = "# LibCarla Profiler ";
       header += carla::version();
 #ifdef NDEBUG
       header += " (release)";

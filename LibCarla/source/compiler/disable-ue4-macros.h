@@ -1,7 +1,7 @@
 #pragma push_macro("check")
 #undef check
 
-#define CARLALIB_INCLUDED_FROM_UE4
+#define LIBCARLA_INCLUDED_FROM_UE4
 
 #ifndef BOOST_ERROR_CODE_HEADER_ONLY
 #  define BOOST_ERROR_CODE_HEADER_ONLY

@@ -3,11 +3,11 @@ project(libcarla)
 
 message(STATUS "Building ${PROJECT_NAME} version ${CARLA_VERSION}")
 
-set(carlalib_source_path "${PROJECT_SOURCE_DIR}/source")
+set(libcarla_source_path "${PROJECT_SOURCE_DIR}/source")
 
-include_directories(${carlalib_source_path})
+include_directories(${libcarla_source_path})
 
-configure_file(${carlalib_source_path}/carla/Version.h.in ${carlalib_source_path}/carla/Version.h)
+configure_file(${libcarla_source_path}/carla/Version.h.in ${libcarla_source_path}/carla/Version.h)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Client")
   add_subdirectory("cmake/client")

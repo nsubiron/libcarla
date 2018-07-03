@@ -6,7 +6,7 @@ source $(dirname "$0")/Environment.sh
 # -- Parse arguments -----------------------------------------------------------
 # ==============================================================================
 
-DOC_STRING="Build CarlaLib."
+DOC_STRING="Build LibCarla."
 
 USAGE_STRING="Usage: $0 [-h|--help] [--rebuild] [--server] [--client] [--clean]"
 
@@ -58,8 +58,8 @@ if ${REMOVE_INTERMEDIATE} ; then
 
   log "Cleaning intermediate files and folders."
 
-  rm -Rf ${CARLALIB_BUILD_SERVER_FOLDER} ${CARLALIB_BUILD_CLIENT_FOLDER}
-  rm -Rf ${CARLALIB_INSTALL_SERVER_FOLDER} ${CARLALIB_INSTALL_CLIENT_FOLDER}
+  rm -Rf ${LIBCARLA_BUILD_SERVER_FOLDER} ${LIBCARLA_BUILD_CLIENT_FOLDER}
+  rm -Rf ${LIBCARLA_INSTALL_SERVER_FOLDER} ${LIBCARLA_INSTALL_CLIENT_FOLDER}
 
 fi
 
@@ -69,10 +69,10 @@ fi
 
 if ${BUILD_SERVER} ; then
 
-  log "Building CarlaLib \"Server\" configuration."
+  log "Building LibCarla \"Server\" configuration."
 
-  mkdir -p ${CARLALIB_BUILD_SERVER_FOLDER}
-  pushd "${CARLALIB_BUILD_SERVER_FOLDER}" >/dev/null
+  mkdir -p ${LIBCARLA_BUILD_SERVER_FOLDER}
+  pushd "${LIBCARLA_BUILD_SERVER_FOLDER}" >/dev/null
 
   if [ ! -f "build.ninja" ]; then
 
@@ -80,7 +80,7 @@ if ${BUILD_SERVER} ; then
         -G "Ninja" \
         -DCMAKE_BUILD_TYPE=Server \
         -DCMAKE_TOOLCHAIN_FILE=${LIBCPP_TOOLCHAIN_FILE} \
-        -DCMAKE_INSTALL_PREFIX=${CARLALIB_INSTALL_SERVER_FOLDER} \
+        -DCMAKE_INSTALL_PREFIX=${LIBCARLA_INSTALL_SERVER_FOLDER} \
         ${CARLA_ROOT_FOLDER}
 
   fi
@@ -99,10 +99,10 @@ fi
 
 if ${BUILD_CLIENT} ; then
 
-  log "Building CarlaLib \"Client\" configuration."
+  log "Building LibCarla \"Client\" configuration."
 
-  mkdir -p ${CARLALIB_BUILD_CLIENT_FOLDER}
-  pushd "${CARLALIB_BUILD_CLIENT_FOLDER}" >/dev/null
+  mkdir -p ${LIBCARLA_BUILD_CLIENT_FOLDER}
+  pushd "${LIBCARLA_BUILD_CLIENT_FOLDER}" >/dev/null
 
   if [ ! -f "build.ninja" ]; then
 
@@ -110,7 +110,7 @@ if ${BUILD_CLIENT} ; then
         -G "Ninja" \
         -DCMAKE_BUILD_TYPE=Client \
         -DCMAKE_TOOLCHAIN_FILE=${LIBSTDCPP_TOOLCHAIN_FILE} \
-        -DCMAKE_INSTALL_PREFIX=${CARLALIB_INSTALL_CLIENT_FOLDER} \
+        -DCMAKE_INSTALL_PREFIX=${LIBCARLA_INSTALL_CLIENT_FOLDER} \
         ${CARLA_ROOT_FOLDER}
 
   fi

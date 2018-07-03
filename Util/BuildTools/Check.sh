@@ -17,7 +17,7 @@ Then either ran all the tests
 
 Or choose one or more of the following
 
-    [--carlalib-release] [--carlalib-debug]
+    [--libcarla-release] [--libcarla-debug]
     [--python-api-2] [--python-api-3]
     [--benchmark]
 END
@@ -25,12 +25,12 @@ END
 
 GDB=
 GTEST_ARGS=
-CARLALIB_RELEASE=false
-CARLALIB_DEBUG=false
+LIBCARLA_RELEASE=false
+LIBCARLA_DEBUG=false
 PYTHON_API_2=false
 PYTHON_API_3=false
 
-OPTS=`getopt -o h --long help,gdb,gtest_args:,all,carlalib-release,carlalib-debug,python-api-2,python-api-3,benchmark -n 'parse-options' -- "$@"`
+OPTS=`getopt -o h --long help,gdb,gtest_args:,all,libcarla-release,libcarla-debug,python-api-2,python-api-3,benchmark -n 'parse-options' -- "$@"`
 
 if [ $? != 0 ] ; then echo "$USAGE_STRING" ; exit 2 ; fi
 
@@ -45,16 +45,16 @@ while true; do
       GTEST_ARGS="$2";
       shift ;;
     --all )
-      CARLALIB_RELEASE=true;
-      CARLALIB_DEBUG=true;
+      LIBCARLA_RELEASE=true;
+      LIBCARLA_DEBUG=true;
       PYTHON_API_2=true;
       PYTHON_API_3=true;
       shift ;;
-    --carlalib-release )
-      CARLALIB_RELEASE=true;
+    --libcarla-release )
+      LIBCARLA_RELEASE=true;
       shift ;;
-    --carlalib-debug )
-      CARLALIB_DEBUG=true;
+    --libcarla-debug )
+      LIBCARLA_DEBUG=true;
       shift ;;
     --python-api-2 )
       PYTHON_API_2=true;
@@ -63,7 +63,7 @@ while true; do
       PYTHON_API_3=true;
       shift ;;
     --benchmark )
-      CARLALIB_RELEASE=true;
+      LIBCARLA_RELEASE=true;
       GTEST_ARGS="--gtest_filter=benchmark*";
       shift ;;
     -h | --help )
@@ -76,27 +76,27 @@ while true; do
   esac
 done
 
-if ! { ${CARLALIB_RELEASE} || ${CARLALIB_DEBUG} || ${PYTHON_API_2} || ${PYTHON_API_3}; }; then
+if ! { ${LIBCARLA_RELEASE} || ${LIBCARLA_DEBUG} || ${PYTHON_API_2} || ${PYTHON_API_3}; }; then
   fatal_error "Nothing selected to be done."
 fi
 
 # ==============================================================================
-# -- Run CarlaLib tests --------------------------------------------------------
+# -- Run LibCarla tests --------------------------------------------------------
 # ==============================================================================
 
-if ${CARLALIB_DEBUG} ; then
+if ${LIBCARLA_DEBUG} ; then
 
-  log "Running CarlaLib unit tests debug."
+  log "Running LibCarla unit tests debug."
 
-  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${GDB} ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_debug ${GTEST_ARGS}
+  LD_LIBRARY_PATH=${LIBCARLA_INSTALL_SERVER_FOLDER}/lib ${GDB} ${LIBCARLA_INSTALL_SERVER_FOLDER}/test/libcarla_test_debug ${GTEST_ARGS}
 
 fi
 
-if ${CARLALIB_RELEASE} ; then
+if ${LIBCARLA_RELEASE} ; then
 
-  log "Running CarlaLib unit tests release."
+  log "Running LibCarla unit tests release."
 
-  LD_LIBRARY_PATH=${CARLALIB_INSTALL_SERVER_FOLDER}/lib ${GDB} ${CARLALIB_INSTALL_SERVER_FOLDER}/test/carlalib_test_release ${GTEST_ARGS}
+  LD_LIBRARY_PATH=${LIBCARLA_INSTALL_SERVER_FOLDER}/lib ${GDB} ${LIBCARLA_INSTALL_SERVER_FOLDER}/test/libcarla_test_release ${GTEST_ARGS}
 
 fi
 

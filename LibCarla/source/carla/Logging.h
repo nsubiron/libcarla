@@ -6,23 +6,23 @@
 
 #pragma once
 
-#define CARLALIB_LOG_LEVEL_DEBUG     10
-#define CARLALIB_LOG_LEVEL_INFO      20
-#define CARLALIB_LOG_LEVEL_WARNING   30
-#define CARLALIB_LOG_LEVEL_ERROR     40
-#define CARLALIB_LOG_LEVEL_CRITICAL  50
-#define CARLALIB_LOG_LEVEL_NONE     100
+#define LIBCARLA_LOG_LEVEL_DEBUG     10
+#define LIBCARLA_LOG_LEVEL_INFO      20
+#define LIBCARLA_LOG_LEVEL_WARNING   30
+#define LIBCARLA_LOG_LEVEL_ERROR     40
+#define LIBCARLA_LOG_LEVEL_CRITICAL  50
+#define LIBCARLA_LOG_LEVEL_NONE     100
 
-#ifndef CARLALIB_LOG_LEVEL
+#ifndef LIBCARLA_LOG_LEVEL
 #  ifdef NDEBUG
-#    define CARLALIB_LOG_LEVEL CARLALIB_LOG_LEVEL_WARNING
+#    define LIBCARLA_LOG_LEVEL LIBCARLA_LOG_LEVEL_WARNING
 #  else
-#    define CARLALIB_LOG_LEVEL CARLALIB_LOG_LEVEL_INFO
+#    define LIBCARLA_LOG_LEVEL LIBCARLA_LOG_LEVEL_INFO
 #  endif // NDEBUG
-#endif // CARLALIB_LOG_LEVEL
+#endif // LIBCARLA_LOG_LEVEL
 
 // The following log functions are available, they are only active if
-// CARLALIB_LOG_LEVEL is greater equal the function's log level.
+// LIBCARLA_LOG_LEVEL is greater equal the function's log level.
 //
 //  * log_debug
 //  * log_info
@@ -59,7 +59,7 @@ namespace logging {
 
 } // namespace logging
 
-#if CARLALIB_LOG_LEVEL <= CARLALIB_LOG_LEVEL_DEBUG
+#if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_DEBUG
 
   template <typename ... Args>
   static inline void log_debug(Args && ... args) {
@@ -73,7 +73,7 @@ namespace logging {
 
 #endif
 
-#if CARLALIB_LOG_LEVEL <= CARLALIB_LOG_LEVEL_INFO
+#if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_INFO
 
   template <typename ... Args>
   static inline void log_info(Args && ... args) {
@@ -87,7 +87,7 @@ namespace logging {
 
 #endif
 
-#if CARLALIB_LOG_LEVEL <= CARLALIB_LOG_LEVEL_WARNING
+#if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_WARNING
 
   template <typename ... Args>
   static inline void log_warning(Args && ... args) {
@@ -101,7 +101,7 @@ namespace logging {
 
 #endif
 
-#if CARLALIB_LOG_LEVEL <= CARLALIB_LOG_LEVEL_ERROR
+#if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_ERROR
 
   template <typename ... Args>
   static inline void log_error(Args && ... args) {
@@ -115,7 +115,7 @@ namespace logging {
 
 #endif
 
-#if CARLALIB_LOG_LEVEL <= CARLALIB_LOG_LEVEL_CRITICAL
+#if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_CRITICAL
 
   template <typename ... Args>
   static inline void log_critical(Args && ... args) {
@@ -135,13 +135,13 @@ namespace logging {
 // -- Implementation of macros -------------------------------------------------
 // =============================================================================
 
-#if CARLALIB_LOG_LEVEL <= CARLALIB_LOG_LEVEL_DEBUG
+#if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_DEBUG
 #  define LOG_DEBUG_ONLY(code) code
 #else
 #  define LOG_DEBUG_ONLY(code)
 #endif
 
-#if CARLALIB_LOG_LEVEL <= CARLALIB_LOG_LEVEL_INFO
+#if LIBCARLA_LOG_LEVEL <= LIBCARLA_LOG_LEVEL_INFO
 #  define LOG_INFO_ONLY(code) code
 #else
 #  define LOG_INFO_ONLY(code)

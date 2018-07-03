@@ -116,7 +116,7 @@ AUTOPEP8_COMMAND="autopep8 --jobs 0 --in-place -a"
 if ${PRETTIFY_ALL} ; then
 
   find ${CARLA_ROOT_FOLDER} -iregex '.*\.\(py\)$' -exec ${AUTOPEP8_COMMAND} {} +
-  # find ${CARLALIB_ROOT_FOLDER} -iregex '.*\.\(h\|cpp\)$' -exec ${UNCRUSTIFY_COMMAND} {} \;
+  # find ${LIBCARLA_ROOT_FOLDER} -iregex '.*\.\(h\|cpp\)$' -exec ${UNCRUSTIFY_COMMAND} {} \;
 
 elif [[ -f ${PRETTIFY_FILE} ]] ; then
 

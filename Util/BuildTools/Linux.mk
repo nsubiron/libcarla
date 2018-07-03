@@ -5,7 +5,7 @@ default: help
 help:
 	@less ${CARLA_BUILD_TOOLS_FOLDER}/Linux.mk.help
 
-launch: CarlaLib
+launch: LibCarla
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --build --launch
 
 launch-only:
@@ -21,10 +21,10 @@ docs:
 clean:
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --clean
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --clean
-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaLib.sh --clean
+	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --clean
 
 rebuild: setup
-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaLib.sh --rebuild
+	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --rebuild
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --rebuild
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --rebuild
 
@@ -35,20 +35,20 @@ hard-clean: clean
 check: PythonAPI
 	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh $(ARGS)
 
-benchmark: CarlaLib
+benchmark: LibCarla
 	@${CARLA_BUILD_TOOLS_FOLDER}/Check.sh --benchmark
 	@cat .profiler.csv
 
-CarlaUE4Editor: CarlaLib
+CarlaUE4Editor: LibCarla
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaUE4.sh --build
 
 .PHONY: PythonAPI
-PythonAPI: CarlaLib
+PythonAPI: LibCarla
 	@${CARLA_BUILD_TOOLS_FOLDER}/BuildPythonAPI.sh --py2 --py3
 
-.PHONY: CarlaLib
-CarlaLib: setup
-	@${CARLA_BUILD_TOOLS_FOLDER}/BuildCarlaLib.sh --server --client
+.PHONY: LibCarla
+LibCarla: setup
+	@${CARLA_BUILD_TOOLS_FOLDER}/BuildLibCarla.sh --server --client
 
 setup:
 	@${CARLA_BUILD_TOOLS_FOLDER}/Setup.sh

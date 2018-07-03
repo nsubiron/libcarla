@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef NDEBUG
-#  define CARLALIB_LOG_LEVEL CARLALIB_LOG_LEVEL_INFO
+#  define LIBCARLA_LOG_LEVEL LIBCARLA_LOG_LEVEL_INFO
 #endif // NDEBUG
 
 #include "test/util/Message.h"

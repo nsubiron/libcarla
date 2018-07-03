@@ -47,11 +47,11 @@ for developers:
 
     check:
 
-        Run unit test suites for CarlaLib and PythonAPI.
+        Run unit test suites for LibCarla and PythonAPI.
 
     benchmark:
 
-        Run the benchmark tests for CarlaLib.
+        Run the benchmark tests for LibCarla.
 
     CarlaUE4Editor:
 
@@ -61,9 +61,9 @@ for developers:
 
         Build and package the Python API module for Python 2 and 3.
 
-    CarlaLib:
+    LibCarla:
 
-        Build the CarlaLib library both "Server" and "Client" configurations.
+        Build the LibCarla library both "Server" and "Client" configurations.
 
     setup:
 
@@ -71,6 +71,6 @@ for developers:
 
     pretty:
 
-        Prettify code files. Run uncrustify on CarlaLib C++ files.
+        Prettify code files. Run uncrustify on LibCarla C++ files.
 
 

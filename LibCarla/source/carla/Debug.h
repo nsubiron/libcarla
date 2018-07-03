@@ -18,7 +18,7 @@
 
 #define DEBUG_ASSERT(predicate) DEBUG_ONLY(assert(predicate));
 
-#ifdef CARLALIB_WITH_GTEST
+#ifdef LIBCARLA_WITH_GTEST
 #  include <gtest/gtest.h>
 
 #  define DEBUG_ASSERT_EQ(lhs, rhs) DEBUG_ONLY(EXPECT_EQ(lhs, rhs));DEBUG_ASSERT(lhs == rhs);
@@ -26,4 +26,4 @@
 #else
 #  define DEBUG_ASSERT_EQ(lhs, rhs) DEBUG_ASSERT((lhs) == (rhs))
 #  define DEBUG_ASSERT_NE(lhs, rhs) DEBUG_ASSERT((lhs) != (rhs))
-#endif // CARLALIB_WITH_GTEST
+#endif // LIBCARLA_WITH_GTEST

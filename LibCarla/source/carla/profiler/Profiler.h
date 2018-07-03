@@ -1,8 +1,8 @@
 #pragma once
 
-#ifndef CARLALIB_ENABLE_PROFILER
-#  define CARLALIB_PROFILE_SCOPE(context, profiler_name)
-#  define CARLALIB_PROFILE_FPS(context, profiler_name)
+#ifndef LIBCARLA_ENABLE_PROFILER
+#  define CARLA_PROFILE_SCOPE(context, profiler_name)
+#  define CARLA_PROFILE_FPS(context, profiler_name)
 #else
 
 #include "carla/StopWatch.h"
@@ -88,26 +88,26 @@ namespace detail {
 } // namespace profiler
 } // namespace carla
 
-#ifdef CARLALIB_WITH_GTEST
-#  define CARLALIB_GTEST_GET_TEST_NAME() std::string(::testing::UnitTest::GetInstance()->current_test_info()->name())
+#ifdef LIBCARLA_WITH_GTEST
+#  define LIBCARLA_GTEST_GET_TEST_NAME() std::string(::testing::UnitTest::GetInstance()->current_test_info()->name())
 #else
-#  define CARLALIB_GTEST_GET_TEST_NAME() std::string("")
-#endif // CARLALIB_WITH_GTEST
+#  define LIBCARLA_GTEST_GET_TEST_NAME() std::string("")
+#endif // LIBCARLA_WITH_GTEST
 
-#define CARLALIB_PROFILE_SCOPE(context, profiler_name) \
+#define CARLA_PROFILE_SCOPE(context, profiler_name) \
     static thread_local ::carla::profiler::detail::ProfilerData carla_profiler_ ## context ## _ ## profiler_name ## _data( \
-        CARLALIB_GTEST_GET_TEST_NAME() + "." #context "." #profiler_name); \
+        LIBCARLA_GTEST_GET_TEST_NAME() + "." #context "." #profiler_name); \
     ::carla::profiler::detail::ScopedProfiler carla_profiler_ ## context ## _ ## profiler_name ## _scoped_profiler( \
         carla_profiler_ ## context ## _ ## profiler_name ## _data);
 
-#define CARLALIB_PROFILE_FPS(context, profiler_name) \
+#define CARLA_PROFILE_FPS(context, profiler_name) \
     { \
       static thread_local ::carla::StopWatch stop_watch; \
       stop_watch.Stop(); \
       static thread_local bool first_time = true; \
       if (!first_time) { \
         static thread_local ::carla::profiler::detail::ProfilerData profiler_data( \
-            CARLALIB_GTEST_GET_TEST_NAME() + "." #context "." #profiler_name, true); \
+            LIBCARLA_GTEST_GET_TEST_NAME() + "." #context "." #profiler_name, true); \
         profiler_data.Annotate(stop_watch); \
       } else { \
         first_time = false; \
@@ -115,4 +115,4 @@ namespace detail {
       stop_watch.Restart(); \
     }
 
-#endif // CARLALIB_ENABLE_PROFILER
+#endif // LIBCARLA_ENABLE_PROFILER

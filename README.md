@@ -94,13 +94,13 @@ Get and compile dependencies
   * boost-1.67 (headers only)
   * googletest-1.8.0 (with libc++)
 
-#### CarlaLib
+#### LibCarla
 
 Compiled with CMake (min. version required CMake 3.9).
 
 Command
 
-    $ make CarlaLib
+    $ make LibCarla
 
 Two configurations:
 

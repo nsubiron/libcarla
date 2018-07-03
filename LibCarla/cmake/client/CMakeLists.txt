@@ -5,13 +5,13 @@ project(libcarla-client)
 install(DIRECTORY "${RPCLIB_INCLUDE_PATH}/rpc" DESTINATION include)
 install(FILES "${RPCLIB_LIB_PATH}/librpc.a" DESTINATION lib)
 
-file(GLOB_RECURSE carlalib_client_sources
-    "${carlalib_source_path}/carla/client/*.h"
-    "${carlalib_source_path}/carla/client/*.cpp")
+file(GLOB_RECURSE libcarla_client_sources
+    "${libcarla_source_path}/carla/client/*.h"
+    "${libcarla_source_path}/carla/client/*.cpp")
 
 # Create targets for debug and release in the same build type.
 foreach(target carla_client_debug carla_client)
-  add_library(${target} STATIC ${carlalib_client_sources})
+  add_library(${target} STATIC ${libcarla_client_sources})
 
   target_include_directories(${target} PRIVATE
       "${BOOST_INCLUDE_PATH}"
@@ -29,14 +29,14 @@ set_target_properties(carla_client PROPERTIES COMPILE_FLAGS ${CMAKE_CXX_FLAGS_RE
 
 # Install headers.
 
-file(GLOB carlalib_carla_headers "${carlalib_source_path}/carla/*.h")
-install(FILES ${carlalib_carla_headers} DESTINATION include/carla)
+file(GLOB libcarla_carla_headers "${libcarla_source_path}/carla/*.h")
+install(FILES ${libcarla_carla_headers} DESTINATION include/carla)
 
-file(GLOB carlalib_carla_client_headers "${carlalib_source_path}/carla/client/*.h")
-install(FILES ${carlalib_carla_client_headers} DESTINATION include/carla/client)
+file(GLOB libcarla_carla_client_headers "${libcarla_source_path}/carla/client/*.h")
+install(FILES ${libcarla_carla_client_headers} DESTINATION include/carla/client)
 
-file(GLOB carlalib_carla_rpc_headers "${carlalib_source_path}/carla/rpc/*.h")
-install(FILES ${carlalib_carla_rpc_headers} DESTINATION include/carla/rpc)
+file(GLOB libcarla_carla_rpc_headers "${libcarla_source_path}/carla/rpc/*.h")
+install(FILES ${libcarla_carla_rpc_headers} DESTINATION include/carla/rpc)
 
-file(GLOB carlalib_carla_streaming_headers "${carlalib_source_path}/carla/streaming/*.h")
-install(FILES ${carlalib_carla_streaming_headers} DESTINATION include/carla/streaming)
+file(GLOB libcarla_carla_streaming_headers "${libcarla_source_path}/carla/streaming/*.h")
+install(FILES ${libcarla_carla_streaming_headers} DESTINATION include/carla/streaming)
