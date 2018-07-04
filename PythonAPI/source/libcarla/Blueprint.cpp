@@ -1,3 +1,9 @@
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
+
 #include <carla/client/BlueprintLibrary.h>
 #include <carla/client/ActorBlueprint.h>
 
@@ -34,7 +40,7 @@ void export_blueprint() {
     .add_property("type_id", +[](const cc::ActorBlueprint &self) -> std::string {
       return self.GetTypeId();
     })
-    .def("startswith", &cc::ActorBlueprint::StartsWith, "this is the startswith function")
+    .def("startswith", &cc::ActorBlueprint::StartsWith)
     .def("match", &cc::ActorBlueprint::MatchWildcards)
     .def(self_ns::str(self_ns::self))
   ;
