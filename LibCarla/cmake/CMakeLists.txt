@@ -3,17 +3,17 @@ project(libcarla)
 
 message(STATUS "Building ${PROJECT_NAME} version ${CARLA_VERSION}")
 
-set(libcarla_source_path "${PROJECT_SOURCE_DIR}/source")
+set(libcarla_source_path "${PROJECT_SOURCE_DIR}/../source")
 
 include_directories(${libcarla_source_path})
 
 configure_file(${libcarla_source_path}/carla/Version.h.in ${libcarla_source_path}/carla/Version.h)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Client")
-  add_subdirectory("cmake/client")
+  add_subdirectory("client")
 elseif (CMAKE_BUILD_TYPE STREQUAL "Server")
-  add_subdirectory("cmake/server")
-  add_subdirectory("cmake/test")
+  add_subdirectory("server")
+  add_subdirectory("test")
 else ()
   message(FATAL_ERROR "Unknown build type '${CMAKE_BUILD_TYPE}'")
 endif ()
